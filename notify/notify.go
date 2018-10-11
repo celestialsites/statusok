@@ -10,10 +10,12 @@ import (
 
 //Diffrent types of clients to deliver notifications
 type NotificationTypes struct {
-	MailNotify MailNotify    `json:"mail"`
-	Mailgun    MailgunNotify `json:"mailGun"`
-	Slack      SlackNotify   `json:"slack"`
-	Http       HttpNotify    `json:"httpEndPoint"`
+	MailNotify MailNotify      `json:"mail"`
+	Mailgun    MailgunNotify   `json:"mailGun"`
+	Slack      SlackNotify     `json:"slack"`
+	Http       HttpNotify      `json:"httpEndPoint"`
+	Dingding   DingdingNotify  `json:"dingding"`
+	Pagerduty  PagerdutyNotify `json:"pagerduty"`
 }
 
 type ResponseTimeNotification struct {
@@ -66,7 +68,7 @@ func AddNew(notificationTypes NotificationTypes) {
 		initErr := value.Initialize()
 
 		if initErr != nil {
-			println("Notifications : Failed to Initialize ", value.GetClientName(), ".Please check the deatails in config file ")
+			println("Notifications : Failed to Initialize ", value.GetClientName(), ".Please check the details in config file ")
 			println("Error Details :", initErr.Error())
 		} else {
 			println("Notifications :", value.GetClientName(), " Intialized")
@@ -114,17 +116,17 @@ func SendTestNotification() {
 			println("Error Details :", err.Error())
 			os.Exit(3)
 		} else {
-			println("Sent Test Response Time notification to ", value.GetClientName(), ".Make sure you recieved it")
+			println("Sent Test Response Time notification to ", value.GetClientName(), ". Make sure you received it")
 		}
 
-		err1 := value.SendErrorNotification(ErrorNotification{"http://test.com", "GET", "This is test notification", "Test notiification", "test"})
+		err1 := value.SendErrorNotification(ErrorNotification{"http://test.com", "GET", "This is test notification", "Test notification", "test"})
 
 		if err1 != nil {
 			println("Failed to Send Error notification to ", value.GetClientName(), " Please check the details entered in the config file")
 			println("Error Details :", err1.Error())
 			os.Exit(3)
 		} else {
-			println("Sent Test Error notification to ", value.GetClientName(), ".Make sure you recieved it")
+			println("Sent Test Error notification to ", value.GetClientName(), ". Make sure you received it")
 		}
 	}
 }
@@ -150,7 +152,7 @@ func isEmptyObject(objectString string) bool {
 //A readable message string from responseTimeNotification
 func getMessageFromResponseTimeNotification(responseTimeNotification ResponseTimeNotification) string {
 
-	message := fmt.Sprintf("Notifiaction From StatusOk\n\nOne of your apis response time is below than expected."+
+	message := fmt.Sprintf("Notification From StatusOk\n\nOne of your apis response time is below than expected."+
 		"\n\nPlease find the Details below"+
 		"\n\nUrl: %v \nRequestType: %v \nCurrent Average Response Time: %v ms\nExpected Response Time: %v ms\n"+
 		"\n\nThanks", responseTimeNotification.Url, responseTimeNotification.RequestType, responseTimeNotification.MeanResponseTime, responseTimeNotification.ExpectedResponsetime)
@@ -161,7 +163,7 @@ func getMessageFromResponseTimeNotification(responseTimeNotification ResponseTim
 //A readable message string from errorNotification
 func getMessageFromErrorNotification(errorNotification ErrorNotification) string {
 
-	message := fmt.Sprintf("Notifiaction From StatusOk\n\nWe are getting error when we try to send request to one of your apis"+
+	message := fmt.Sprintf("Notification From StatusOk\n\nWe are getting error when we try to send request to one of your apis"+
 		"\n\nPlease find the Details below"+
 		"\n\nUrl: %v \nRequestType: %v \nError Message: %v \nResponse Body: %v\nOther Info:%v\n"+
 		"\n\nThanks", errorNotification.Url, errorNotification.RequestType, errorNotification.Error, errorNotification.ResponseBody, errorNotification.OtherInfo)
